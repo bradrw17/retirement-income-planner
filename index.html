@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retirement Income Planner</title>
+    <title>Financial Planner — Brad & Ash</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,1764 +11,505 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --deep-navy: #0f1c2e;
-            --rich-blue: #1e3a5f;
-            --gold: #d4af37;
-            --soft-gold: #f4e4c1;
-            --cream: #faf8f5;
-            --sage: #8b9d83;
-            --charcoal: #2d3436;
-            --slate: #5f6c7b;
-            --light-slate: #e8ecf1;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--cream) 0%, #ffffff 100%);
-            color: var(--charcoal);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-        
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            position: relative;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--gold), var(--sage));
-            border-radius: 2px;
-        }
-        
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--deep-navy);
-            margin-bottom: 12px;
-            letter-spacing: -0.02em;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--slate);
-            font-weight: 400;
-            letter-spacing: 0.3px;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 40px;
-            align-items: start;
-            transition: grid-template-columns 0.3s ease;
-        }
-        
-        .main-content.collapsed {
-            grid-template-columns: 0fr 1fr;
-        }
-        
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .main-content.collapsed {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .input-panel {
-            background: white;
-            border-radius: 16px;
-            padding: 35px;
-            box-shadow: 0 4px 6px rgba(15, 28, 46, 0.04), 0 10px 25px rgba(15, 28, 46, 0.08);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            position: sticky;
-            top: 20px;
-            transition: all 0.3s ease;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        
-        .input-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .input-panel::-webkit-scrollbar-track {
-            background: var(--cream);
-            border-radius: 4px;
-        }
-        
-        .input-panel::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 4px;
-        }
-        
-        .input-panel::-webkit-scrollbar-thumb:hover {
-            background: var(--deep-navy);
-        }
-        
-        .main-content.collapsed .input-panel {
-            opacity: 0;
-            padding: 0;
-            margin: 0;
-            width: 0;
-            min-width: 0;
-            border: none;
-            box-shadow: none;
-        }
-        
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--deep-navy);
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--soft-gold);
-            font-weight: 600;
-        }
-        
-        .input-group {
-            margin-bottom: 24px;
-        }
-        
-        .input-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--slate);
-            margin-bottom: 6px;
-            letter-spacing: 0.2px;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--light-slate);
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: 'IBM Plex Sans', sans-serif;
-            transition: all 0.2s;
-            background: var(--cream);
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--gold);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
-        }
-        
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        
-        .results-panel {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 4px 6px rgba(15, 28, 46, 0.04), 0 10px 25px rgba(15, 28, 46, 0.08);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-        }
-        
-        .chart-container {
-            margin-bottom: 40px;
-            padding: 25px;
-            background: linear-gradient(135deg, var(--cream) 0%, #ffffff 100%);
-            border-radius: 12px;
-            border: 1px solid rgba(139, 157, 131, 0.2);
-        }
-        
-        .chart-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
-            color: var(--deep-navy);
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        
-        .summary-card {
-            padding: 24px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--rich-blue) 0%, var(--deep-navy) 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .summary-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-        
-        .summary-card-label {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-        }
-        
-        .summary-card-value {
-            font-size: 2rem;
-            font-weight: 600;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 20px;
-            font-size: 0.9rem;
-        }
-        
-        .data-table thead {
-            background: var(--deep-navy);
-            color: white;
-        }
-        
-        .data-table th {
-            padding: 14px 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .data-table th:first-child {
-            border-radius: 8px 0 0 0;
-        }
-        
-        .data-table th:last-child {
-            border-radius: 0 8px 0 0;
-        }
-        
-        .data-table tbody tr {
-            transition: background 0.2s;
-        }
-        
-        .data-table tbody tr:nth-child(even) {
-            background: var(--cream);
-        }
-        
-        .data-table tbody tr:hover {
-            background: var(--soft-gold);
-        }
-        
-        .data-table td {
-            padding: 12px;
-            border-bottom: 1px solid var(--light-slate);
-        }
-        
-        .data-table tbody tr:last-child td:first-child {
-            border-radius: 0 0 0 8px;
-        }
-        
-        .data-table tbody tr:last-child td:last-child {
-            border-radius: 0 0 8px 0;
-        }
-        
-        .negative {
-            color: #c0392b;
-        }
-        
-        .positive {
-            color: var(--sage);
-        }
-        
-        canvas {
-            max-height: 350px;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            border-bottom: 2px solid var(--light-slate);
-        }
-        
-        .tab {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--slate);
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: -2px;
-        }
-        
-        .tab.active {
-            color: var(--deep-navy);
-            border-bottom-color: var(--gold);
-        }
-        
-        .tab:hover:not(.active) {
-            color: var(--charcoal);
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .results-panel {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .toggle-button {
-            position: fixed;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--deep-navy);
-            color: white;
-            border: none;
-            border-radius: 0 8px 8px 0;
-            padding: 16px 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(15, 28, 46, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            letter-spacing: 1px;
-        }
-        
-        .toggle-button:hover {
-            background: var(--gold);
-            color: var(--deep-navy);
-            transform: translateY(-50%) translateX(3px);
-        }
-        
-        .main-content.collapsed .toggle-button {
-            left: 0;
-        }
-        
-        .advanced-toggle {
-            width: 100%;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, var(--light-slate) 0%, var(--cream) 100%);
-            border: 2px solid var(--light-slate);
-            border-radius: 8px;
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--deep-navy);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .advanced-toggle:hover {
-            background: linear-gradient(135deg, var(--soft-gold) 0%, var(--cream) 100%);
-            border-color: var(--gold);
-        }
-        
-        .advanced-toggle::after {
-            content: '▼';
-            transition: transform 0.3s ease;
-            font-size: 0.8rem;
-        }
-        
-        .advanced-toggle.active::after {
-            transform: rotate(180deg);
-        }
-        
-        .advanced-section {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        
-        .advanced-section.show {
-            max-height: 3000px;
-        }
-        
-        .advanced-content {
-            padding-top: 15px;
-        }
-        
-        .advanced-item {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: var(--cream);
-            border-radius: 8px;
-            border: 1px solid var(--light-slate);
-        }
-        
-        .advanced-item-title {
-            font-weight: 600;
-            color: var(--deep-navy);
-            margin-bottom: 12px;
-            font-size: 1rem;
-        }
-        
-        .scenario-controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 30px;
-            justify-content: center;
-        }
-        
-        .scenario-button {
-            padding: 12px 24px;
-            border: 2px solid var(--gold);
-            border-radius: 8px;
-            background: white;
-            color: var(--deep-navy);
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
+            --deep-navy: #0f1c2e; --rich-blue: #1e3a5f; --gold: #d4af37; --soft-gold: #f4e4c1;
+            --cream: #faf8f5; --sage: #8b9d83; --charcoal: #2d3436; --slate: #5f6c7b; --light-slate: #e8ecf1;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, var(--cream) 0%, #fff 100%); color: var(--charcoal); line-height: 1.6; min-height: 100vh; }
+
+        /* TOP NAV */
+        .top-nav { background: linear-gradient(135deg, var(--deep-navy), var(--rich-blue)); padding: 0 40px; position: sticky; top: 0; z-index: 200; box-shadow: 0 4px 20px rgba(15,28,46,0.25); }
+        .top-nav-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .top-nav-brand { display: flex; align-items: center; gap: 14px; padding: 16px 0; }
+        .top-nav-logo { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--gold), #e8c84a); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--deep-navy); font-family: 'Playfair Display', serif; }
+        .top-nav-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: white; }
+        .top-nav-client { color: rgba(255,255,255,0.55); font-size: 0.85rem; margin-left: 4px; }
+        .top-nav-tabs { display: flex; }
+        .top-nav-tab { background: none; border: none; cursor: pointer; padding: 20px 28px; color: rgba(255,255,255,0.6); font-size: 0.95rem; font-weight: 500; font-family: 'IBM Plex Sans', sans-serif; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .top-nav-tab:hover { color: rgba(255,255,255,0.85); }
+        .top-nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 600; }
+        .top-nav-tab svg { width: 18px; height: 18px; }
+        .top-nav-date { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+
+        /* NET WORTH LAYOUT */
+        .nw-layout { display: grid; grid-template-columns: 400px 1fr; gap: 0; transition: grid-template-columns 0.3s ease; max-width: 1600px; margin: 0 auto; }
+        .nw-layout.collapsed { grid-template-columns: 0fr 1fr; }
+        @media (max-width: 1200px) { .nw-layout, .nw-layout.collapsed { grid-template-columns: 1fr; } }
+
+        .nw-sidebar {
+            background: white; padding: 28px; border-right: 1px solid rgba(212,175,55,0.15);
+            box-shadow: 4px 0 20px rgba(15,28,46,0.04);
+            position: sticky; top: 62px; max-height: calc(100vh - 62px); overflow-y: auto; overflow-x: hidden;
             transition: all 0.3s ease;
         }
-        
-        .scenario-button:hover {
-            background: var(--gold);
-            color: white;
+        .nw-sidebar::-webkit-scrollbar { width: 7px; }
+        .nw-sidebar::-webkit-scrollbar-track { background: var(--cream); }
+        .nw-sidebar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+        .nw-layout.collapsed .nw-sidebar { opacity: 0; padding: 0; width: 0; min-width: 0; border: none; overflow: hidden; }
+
+        .nw-sidebar-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--deep-navy); margin-bottom: 6px; font-weight: 700; }
+        .nw-sidebar-sub { color: var(--slate); font-size: 0.8rem; margin-bottom: 22px; }
+
+        .nw-acct-section-label {
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            color: white; background: var(--deep-navy); padding: 8px 12px; border-radius: 6px; margin: 18px 0 12px;
         }
-        
-        .scenario-button.active {
-            background: var(--deep-navy);
-            color: white;
-            border-color: var(--deep-navy);
+        .nw-acct-section-label:first-of-type { margin-top: 0; }
+
+        .nw-acct-block { margin-bottom: 14px; background: var(--cream); border: 1px solid var(--light-slate); border-radius: 8px; padding: 14px; }
+        .nw-acct-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .nw-acct-block-name { font-weight: 600; font-size: 0.88rem; color: var(--deep-navy); }
+        .nw-acct-input { width: 100%; padding: 9px 12px; border: 2px solid var(--light-slate); border-radius: 6px; font-size: 0.95rem; font-family: 'IBM Plex Sans', sans-serif; background: white; transition: all 0.2s; }
+        .nw-acct-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.1); }
+
+        .nw-alloc-toggle {
+            display: flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 10px;
+            background: linear-gradient(135deg, var(--light-slate), var(--cream)); border: 1px solid var(--light-slate);
+            border-radius: 5px; font-size: 0.78rem; font-weight: 600; color: var(--deep-navy);
+            cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Sans', sans-serif; width: 100%;
         }
-        
-        .scenario-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
+        .nw-alloc-toggle:hover { border-color: var(--gold); background: var(--soft-gold); }
+        .nw-alloc-toggle .arrow { transition: transform 0.2s; font-size: 0.7rem; margin-left: auto; }
+        .nw-alloc-toggle .arrow.open { transform: rotate(180deg); }
+
+        .nw-alloc-panel { margin-top: 10px; padding: 10px; background: white; border: 1px solid var(--light-slate); border-radius: 6px; }
+        .nw-alloc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .nw-alloc-row:last-child { margin-bottom: 0; }
+        .nw-alloc-label { font-size: 0.8rem; color: var(--slate); font-weight: 500; width: 100px; flex-shrink: 0; }
+        .nw-alloc-pct-input { width: 65px; padding: 6px 8px; border: 1.5px solid var(--light-slate); border-radius: 5px; font-size: 0.85rem; font-family: 'IBM Plex Sans', sans-serif; text-align: right; background: var(--cream); }
+        .nw-alloc-pct-input:focus { outline: none; border-color: var(--gold); background: white; }
+        .nw-alloc-pct-unit { font-size: 0.8rem; color: var(--slate); }
+        .nw-alloc-val { font-size: 0.8rem; color: var(--deep-navy); font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; min-width: 80px; text-align: right; }
+        .nw-alloc-warn { font-size: 0.75rem; color: #c0392b; margin-top: 6px; font-weight: 500; }
+
+        /* NET WORTH TOGGLE BUTTON */
+        .nw-toggle {
+            position: fixed; left: 20px; top: 50%; transform: translateY(-50%);
+            background: var(--deep-navy); color: white; border: none; border-radius: 0 8px 8px 0;
+            padding: 16px 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(15,28,46,0.3);
+            transition: all 0.3s ease; z-index: 150; font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.85rem; font-weight: 600; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 1px;
         }
-        
-        .scenario-container.compare {
-            grid-template-columns: 1fr 1fr;
-        }
-        
-        @media (max-width: 1400px) {
-            .scenario-container.compare {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .scenario-panel {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(15, 28, 46, 0.04), 0 10px 25px rgba(15, 28, 46, 0.08);
-            border: 2px solid var(--gold);
-        }
-        
-        .scenario-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
-            color: var(--deep-navy);
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .scenario-input-switcher {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            background: var(--light-slate);
-            padding: 6px;
-            border-radius: 8px;
-        }
-        
-        .scenario-switch-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            background: transparent;
-            color: var(--slate);
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .scenario-switch-btn.active {
-            background: white;
-            color: var(--deep-navy);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .print-button {
-            padding: 12px 24px;
-            border: 2px solid var(--deep-navy);
-            border-radius: 8px;
-            background: var(--deep-navy);
-            color: white;
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .print-button:hover {
-            background: var(--gold);
-            border-color: var(--gold);
-            color: var(--deep-navy);
-        }
-        
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .toggle-button,
-            .input-panel,
-            .scenario-controls,
-            .print-button,
-            .tabs {
-                display: none !important;
-            }
-            
-            .main-content {
-                display: block !important;
-                grid-template-columns: 1fr !important;
-            }
-            
-            .scenario-container {
-                display: block !important;
-                page-break-inside: avoid;
-            }
-            
-            .scenario-panel {
-                page-break-inside: avoid;
-                margin-bottom: 40px;
-                border: 2px solid #0f1c2e;
-            }
-            
-            .summary-cards {
-                page-break-inside: avoid;
-            }
-            
-            .chart-container {
-                page-break-inside: avoid;
-                margin-bottom: 30px;
-            }
-            
-            .data-table {
-                page-break-inside: auto;
-                font-size: 0.75rem;
-            }
-            
-            .data-table tr {
-                page-break-inside: avoid;
-            }
-            
-            .header {
-                page-break-after: avoid;
-            }
-            
-            canvas {
-                max-height: 300px;
-            }
-        }
+        .nw-toggle:hover { background: var(--gold); color: var(--deep-navy); transform: translateY(-50%) translateX(3px); }
+
+        /* NET WORTH GRID */
+        .nw-main { padding: 40px 28px 60px; overflow-x: auto; }
+        .nw-title-area { text-align: center; margin-bottom: 30px; }
+        .nw-title-area h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--deep-navy); margin-bottom: 6px; }
+        .nw-title-area p { color: var(--slate); font-size: 0.9rem; }
+
+        .nw-sheet-wrap { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(15,28,46,0.04), 0 10px 25px rgba(15,28,46,0.08); border: 1px solid rgba(212,175,55,0.15); overflow-x: auto; }
+        .nw-sheet { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 860px; }
+        .nw-sheet th, .nw-sheet td { padding: 10px 14px; text-align: right; border: 1px solid #e2e6ec; white-space: nowrap; }
+        .nw-sheet th { background: var(--deep-navy); color: white; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; position: sticky; top: 0; }
+        .nw-sheet th:first-child { text-align: left; min-width: 180px; }
+        .nw-sheet td:first-child { text-align: left; font-weight: 500; }
+        .nw-sheet .section-hdr td { background: linear-gradient(135deg, var(--rich-blue), var(--deep-navy)); color: white; font-weight: 700; font-size: 0.83rem; letter-spacing: 0.5px; text-align: left; text-transform: uppercase; border-color: var(--deep-navy); }
+        .nw-sheet .drow td { background: white; }
+        .nw-sheet .drow:nth-child(even) td { background: #f9fafb; }
+        .nw-sheet .drow:hover td { background: var(--soft-gold); }
+        .nw-sheet .drow td:first-child { padding-left: 28px; color: var(--charcoal); }
+        .nw-sheet .spacer td { background: white; border-left-color: transparent; border-right-color: transparent; height: 10px; padding: 0; }
+        .nw-sheet .total-row td { background: linear-gradient(135deg, var(--deep-navy), var(--rich-blue)); color: white; font-weight: 700; font-size: 0.9rem; border-color: var(--deep-navy); }
+        .nw-sheet .pct-row td { background: var(--cream); color: var(--slate); font-size: 0.82rem; font-weight: 500; font-style: italic; }
+        .nw-sheet .nonre-row td { background: var(--soft-gold); font-weight: 700; color: var(--deep-navy); font-size: 0.9rem; }
+        .nw-sheet .zero { color: #ccc; }
+        .nw-sheet .empty { color: transparent; }
+
+        /* RETIREMENT PLANNER STYLES */
+        .rp-container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+        .rp-header { text-align: center; margin-bottom: 50px; position: relative; }
+        .rp-header::before { content: ''; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: linear-gradient(90deg, var(--gold), var(--sage)); border-radius: 2px; }
+        .rp-header h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--deep-navy); margin-bottom: 12px; letter-spacing: -0.02em; }
+        .rp-header .subtitle { font-size: 1.1rem; color: var(--slate); font-weight: 400; }
+        .rp-main { display: grid; grid-template-columns: 400px 1fr; gap: 40px; align-items: start; transition: grid-template-columns 0.3s ease; }
+        .rp-main.collapsed { grid-template-columns: 0fr 1fr; }
+        @media (max-width: 1200px) { .rp-main, .rp-main.collapsed { grid-template-columns: 1fr; } }
+        .input-panel { background: white; border-radius: 16px; padding: 35px; box-shadow: 0 4px 6px rgba(15,28,46,0.04), 0 10px 25px rgba(15,28,46,0.08); border: 1px solid rgba(212,175,55,0.15); position: sticky; top: 80px; transition: all 0.3s ease; max-height: calc(100vh - 100px); overflow-y: auto; overflow-x: hidden; }
+        .input-panel::-webkit-scrollbar { width: 8px; }
+        .input-panel::-webkit-scrollbar-track { background: var(--cream); border-radius: 4px; }
+        .input-panel::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+        .rp-main.collapsed .input-panel { opacity: 0; padding: 0; margin: 0; width: 0; min-width: 0; border: none; box-shadow: none; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--deep-navy); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--soft-gold); font-weight: 600; }
+        .input-group { margin-bottom: 24px; }
+        .input-group label { display: block; font-size: 0.9rem; font-weight: 500; color: var(--slate); margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 12px 16px; border: 2px solid var(--light-slate); border-radius: 8px; font-size: 1rem; font-family: 'IBM Plex Sans', sans-serif; transition: all 0.2s; background: var(--cream); }
+        .input-group input:focus { outline: none; border-color: var(--gold); background: white; box-shadow: 0 0 0 3px rgba(212,175,55,0.1); }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .results-panel { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(15,28,46,0.04), 0 10px 25px rgba(15,28,46,0.08); border: 1px solid rgba(212,175,55,0.15); }
+        .chart-container { margin-bottom: 40px; padding: 25px; background: linear-gradient(135deg, var(--cream), #fff); border-radius: 12px; border: 1px solid rgba(139,157,131,0.2); }
+        .chart-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--deep-navy); margin-bottom: 20px; font-weight: 600; }
+        .rp-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .rp-summary-card { padding: 24px; border-radius: 12px; background: linear-gradient(135deg, var(--rich-blue), var(--deep-navy)); color: white; position: relative; overflow: hidden; }
+        .rp-summary-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(212,175,55,0.2), transparent 70%); border-radius: 50%; }
+        .rp-summary-card-label { font-size: 0.85rem; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+        .rp-summary-card-value { font-size: 2rem; font-weight: 600; font-family: 'Playfair Display', serif; }
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; font-size: 0.9rem; }
+        .data-table thead { background: var(--deep-navy); color: white; }
+        .data-table th { padding: 14px 12px; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-table th:first-child { border-radius: 8px 0 0 0; } .data-table th:last-child { border-radius: 0 8px 0 0; }
+        .data-table tbody tr { transition: background 0.2s; }
+        .data-table tbody tr:nth-child(even) { background: var(--cream); }
+        .data-table tbody tr:hover { background: var(--soft-gold); }
+        .data-table td { padding: 12px; border-bottom: 1px solid var(--light-slate); }
+        .data-table tbody tr:last-child td:first-child { border-radius: 0 0 0 8px; } .data-table tbody tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+        .negative { color: #c0392b; } .positive { color: var(--sage); }
+        .rp-container canvas { max-height: 350px; }
+        .rp-tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--light-slate); }
+        .rp-tab { padding: 12px 24px; background: none; border: none; border-bottom: 3px solid transparent; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; font-weight: 500; color: var(--slate); cursor: pointer; transition: all 0.2s; margin-bottom: -2px; }
+        .rp-tab.active { color: var(--deep-navy); border-bottom-color: var(--gold); }
+        .rp-tab:hover:not(.active) { color: var(--charcoal); }
+        .toggle-button { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); background: var(--deep-navy); color: white; border: none; border-radius: 0 8px 8px 0; padding: 16px 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(15,28,46,0.3); transition: all 0.3s ease; z-index: 150; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 600; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 1px; }
+        .toggle-button:hover { background: var(--gold); color: var(--deep-navy); transform: translateY(-50%) translateX(3px); }
+        .advanced-toggle { width: 100%; margin-top: 25px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(135deg, var(--light-slate), var(--cream)); border: 2px solid var(--light-slate); border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--deep-navy); cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; }
+        .advanced-toggle:hover { background: linear-gradient(135deg, var(--soft-gold), var(--cream)); border-color: var(--gold); }
+        .advanced-toggle::after { content: '\25BC'; transition: transform 0.3s ease; font-size: 0.8rem; }
+        .advanced-toggle.active::after { transform: rotate(180deg); }
+        .advanced-section { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .advanced-section.show { max-height: 3000px; }
+        .advanced-content { padding-top: 15px; }
+        .advanced-item { margin-bottom: 25px; padding: 20px; background: var(--cream); border-radius: 8px; border: 1px solid var(--light-slate); }
+        .advanced-item-title { font-weight: 600; color: var(--deep-navy); margin-bottom: 12px; font-size: 1rem; }
+        .scenario-controls { display: flex; gap: 12px; margin-bottom: 30px; justify-content: center; }
+        .scenario-button { padding: 12px 24px; border: 2px solid var(--gold); border-radius: 8px; background: white; color: var(--deep-navy); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .scenario-button:hover { background: var(--gold); color: white; }
+        .scenario-container { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        .scenario-container.compare { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 1400px) { .scenario-container.compare { grid-template-columns: 1fr; } }
+        .scenario-panel { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px rgba(15,28,46,0.04), 0 10px 25px rgba(15,28,46,0.08); border: 2px solid var(--gold); }
+        .scenario-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--deep-navy); margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .scenario-input-switcher { display: flex; gap: 8px; margin-bottom: 20px; background: var(--light-slate); padding: 6px; border-radius: 8px; }
+        .scenario-switch-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; background: transparent; color: var(--slate); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .scenario-switch-btn.active { background: white; color: var(--deep-navy); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .print-button { padding: 12px 24px; border: 2px solid var(--deep-navy); border-radius: 8px; background: var(--deep-navy); color: white; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .print-button:hover { background: var(--gold); border-color: var(--gold); color: var(--deep-navy); }
+        .tab-panel { display: none; } .tab-panel.active { display: block; animation: tabFade 0.35s ease; }
+        @keyframes tabFade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .top-nav { padding: 0 16px; } .top-nav-tab { padding: 16px 14px; font-size: 0.85rem; } .top-nav-date { display: none; } }
+        @media print { .top-nav, .toggle-button, .nw-toggle, .input-panel, .nw-sidebar, .scenario-controls, .print-button, .rp-tabs { display: none !important; } .rp-main, .nw-layout { display: block !important; } .scenario-container { display: block !important; } .scenario-panel { page-break-inside: avoid; margin-bottom: 40px; } .data-table { font-size: 0.75rem; } canvas { max-height: 300px; } }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        
-        function RetirementPlanner() {
-            // Input states
-            const [inputs, setInputs] = useState({
-                startingBalance: 1450000,
-                desiredSpending: 84000,
-                ssMr: 30000,
-                ssMrs: 18000,
-                rental: 0,
-                pension: 0,
-                portfolioReturn: 4.0,
-                taxRate: 10.0,
-                inflationGeneral: 2.5,
-                expenseInflation: 2.5,
-                ssInflation: 2.0,
-                ssStartYear: 1,
-                pensionInflation: 1.0,
-                rentalInflation: 2.0,
-                projectionYears: 30
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const fmtD = n => (n===null||n===undefined||isNaN(n)) ? '' : '$'+Math.round(n).toLocaleString();
+const fmtP = n => (!n||isNaN(n)||n===0) ? '-' : (n*100).toFixed(1)+'%';
+
+/* ==================================================================
+   NET WORTH TAB
+   ================================================================== */
+const ALLOC_CLASSES = ['equity','fixedIncome','alternatives','cash'];
+const ALLOC_LABELS = {equity:'Equity',fixedIncome:'Fixed Income',alternatives:'Alternatives & REITs',cash:'Cash'};
+const GRID_COLS = ['Cash','Real Estate','Guaranteed Growth','Private Loans','Equity','Alternatives & REITs','Fixed Income'];
+
+// Map from allocClass key to grid column name
+const allocToGrid = {equity:'Equity',fixedIncome:'Fixed Income',alternatives:'Alternatives & REITs',cash:'Cash'};
+
+function NetWorthTab() {
+    const [collapsed, setCollapsed] = useState(false);
+
+    // Account definitions: id, name, type, hasAlloc (has percentage-based allocation)
+    // fixedAlloc = the account always maps its full value to one specific grid column
+    const [accounts, setAccounts] = useState([
+        { id:'annuity',   name:'Annuity',             type:'after-tax',    value:100000,  hasAlloc:false, fixedCol:'Guaranteed Growth' },
+        { id:'chase_p',   name:'Chase Personal',      type:'after-tax',    value:30000,   hasAlloc:false, fixedCol:'Cash' },
+        { id:'chase_sc',  name:'Chase S Corp',        type:'after-tax',    value:5000,    hasAlloc:false, fixedCol:'Cash' },
+        { id:'jpm',       name:'JP Morgan Brokerage', type:'after-tax',    value:2500000, hasAlloc:true,  alloc:{equity:40.32,fixedIncome:0,alternatives:59.68,cash:0} },
+        { id:'rental',    name:'Rental Property',     type:'after-tax',    value:2000000, hasAlloc:false, fixedCol:'Real Estate' },
+        { id:'529a',      name:'529 (Child 1)',       type:'after-tax',    value:75200,   hasAlloc:true,  alloc:{equity:100,fixedIncome:0,alternatives:0,cash:0} },
+        { id:'529b',      name:'529 (Child 2)',       type:'after-tax',    value:75200,   hasAlloc:true,  alloc:{equity:100,fixedIncome:0,alternatives:0,cash:0} },
+        { id:'fid_ira',   name:'Fidelity IRA',        type:'tax-deferred', value:377310,  hasAlloc:true,  alloc:{equity:100,fixedIncome:0,alternatives:0,cash:0} },
+        { id:'fid_roth',  name:'Fidelity Roth',       type:'tax-deferred', value:148829,  hasAlloc:true,  alloc:{equity:100,fixedIncome:0,alternatives:0,cash:0} },
+    ]);
+    const [openAllocs, setOpenAllocs] = useState({});
+
+    const toggleAlloc = id => setOpenAllocs(p => ({...p, [id]: !p[id]}));
+    const updateValue = (id, val) => setAccounts(prev => prev.map(a => a.id===id ? {...a, value: val==='' ? '' : (parseFloat(val)||0)} : a));
+    const updateAllocPct = (id, cls, val) => {
+        setAccounts(prev => prev.map(a => {
+            if (a.id !== id) return a;
+            const newAlloc = {...a.alloc, [cls]: val==='' ? '' : (parseFloat(val)||0)};
+            return {...a, alloc: newAlloc};
+        }));
+    };
+
+    // Compute grid values for each account
+    const computeRow = (acct) => {
+        const row = {};
+        GRID_COLS.forEach(c => row[c] = 0);
+        const v = parseFloat(acct.value) || 0;
+        if (!acct.hasAlloc) {
+            if (acct.fixedCol) row[acct.fixedCol] = v;
+        } else {
+            ALLOC_CLASSES.forEach(cls => {
+                const pct = (parseFloat(acct.alloc[cls]) || 0) / 100;
+                const gridCol = allocToGrid[cls];
+                if (gridCol) row[gridCol] += v * pct;
             });
-            
-            const [advancedFunctions, setAdvancedFunctions] = useState({
-                mortgageAmount: 0,
-                mortgageDropOffYear: 1,
-                inheritanceAmount: 0,
-                inheritanceYear: 1,
-                retirementPV: 0,
-                retirementYears: 0,
-                retirementRate: 7,
-                retirementPMT: 0,
-                rentalPropertyValue: 0,
-                rentalPropertySellYear: 1
-            });
-            
-            const [scenario2Inputs, setScenario2Inputs] = useState(null);
-            const [scenario2Advanced, setScenario2Advanced] = useState(null);
-            const [compareMode, setCompareMode] = useState(false);
-            const [activeScenarioInput, setActiveScenarioInput] = useState(1); // Which scenario inputs to show
-            
-            const [activeTab, setActiveTab] = useState('portfolio');
-            const [isCollapsed, setIsCollapsed] = useState(false);
-            const [showAdvanced, setShowAdvanced] = useState(false);
-            const chartRef = useRef(null);
-            const chartInstance = useRef(null);
-            const chartRef2 = useRef(null);
-            const chartInstance2 = useRef(null);
-            
-            const handleInputChange = (field, value) => {
-                // Allow empty string (when user clears the field)
-                if (value === '') {
-                    setInputs(prev => ({
-                        ...prev,
-                        [field]: ''
-                    }));
-                } else {
-                    setInputs(prev => ({
-                        ...prev,
-                        [field]: parseFloat(value) || 0
-                    }));
-                }
-            };
-            
-            const handleAdvancedFunctionChange = (field, value) => {
-                // Allow empty string (when user clears the field)
-                if (value === '') {
-                    setAdvancedFunctions(prev => ({
-                        ...prev,
-                        [field]: ''
-                    }));
-                } else {
-                    setAdvancedFunctions(prev => ({
-                        ...prev,
-                        [field]: parseFloat(value) || 0
-                    }));
-                }
-            };
-            
-            const handleScenario2InputChange = (field, value) => {
-                if (value === '') {
-                    setScenario2Inputs(prev => ({
-                        ...prev,
-                        [field]: ''
-                    }));
-                } else {
-                    setScenario2Inputs(prev => ({
-                        ...prev,
-                        [field]: parseFloat(value) || 0
-                    }));
-                }
-            };
-            
-            const handleScenario2AdvancedChange = (field, value) => {
-                if (value === '') {
-                    setScenario2Advanced(prev => ({
-                        ...prev,
-                        [field]: ''
-                    }));
-                } else {
-                    setScenario2Advanced(prev => ({
-                        ...prev,
-                        [field]: parseFloat(value) || 0
-                    }));
-                }
-            };
-            
-            const createScenario2 = () => {
-                setScenario2Inputs({...inputs});
-                setScenario2Advanced({...advancedFunctions});
-                setCompareMode(true);
-            };
-            
-            const clearScenario2 = () => {
-                setScenario2Inputs(null);
-                setScenario2Advanced(null);
-                setCompareMode(false);
-                setActiveScenarioInput(1);
-            };
-            
-            // Calculate projections
-            const calculateProjections = (inputsData, advancedData) => {
-                const years = [];
-                let portfolioBalance = parseFloat(inputsData.startingBalance) || 0;
-                
-                for (let year = 1; year <= (parseFloat(inputsData.projectionYears) || 30); year++) {
-                    const inflationMultiplier = Math.pow(1 + (parseFloat(inputsData.expenseInflation) || 0) / 100, year - 1);
-                    const ssInflationMult = Math.pow(1 + (parseFloat(inputsData.ssInflation) || 0) / 100, year - 1);
-                    const rentalInflationMult = Math.pow(1 + (parseFloat(inputsData.rentalInflation) || 0) / 100, year - 1);
-                    const pensionInflationMult = Math.pow(1 + (parseFloat(inputsData.pensionInflation) || 0) / 100, year - 1);
-                    
-                    // Social Security starts in the specified year
-                    const ssMrIncome = year >= (parseFloat(inputsData.ssStartYear) || 1) ? (parseFloat(inputsData.ssMr) || 0) * ssInflationMult : 0;
-                    const ssMrsIncome = year >= (parseFloat(inputsData.ssStartYear) || 1) ? (parseFloat(inputsData.ssMrs) || 0) * ssInflationMult : 0;
-                    
-                    // Rental income stops after property is sold
-                    const rentalPropertySellYear = parseFloat(advancedData.rentalPropertySellYear) || 1;
-                    const rentalIncome = year < rentalPropertySellYear ? (parseFloat(inputsData.rental) || 0) * rentalInflationMult : 0;
-                    
-                    const pensionIncome = (parseFloat(inputsData.pension) || 0) * pensionInflationMult;
-                    
-                    // Mortgage savings (reduces spending after drop-off year)
-                    const mortgageSavings = year >= (parseFloat(advancedData.mortgageDropOffYear) || 1) ? (parseFloat(advancedData.mortgageAmount) || 0) : 0;
-                    
-                    const totalOtherIncome = ssMrIncome + ssMrsIncome + rentalIncome + pensionIncome;
-                    const desiredSpending = (parseFloat(inputsData.desiredSpending) || 0) * inflationMultiplier;
-                    const totalNeeded = desiredSpending / (1 - (parseFloat(inputsData.taxRate) || 0) / 100);
-                    const portfolioDraw = totalNeeded - totalOtherIncome - mortgageSavings;
-                    const estimatedTaxes = totalNeeded - desiredSpending;
-                    
-                    // Update portfolio balance
-                    const portfolioReturn = portfolioBalance * ((parseFloat(inputsData.portfolioReturn) || 0) / 100);
-                    
-                    // Add inheritance in the specified year
-                    const inheritanceAmount = year === (parseFloat(advancedData.inheritanceYear) || 1) ? (parseFloat(advancedData.inheritanceAmount) || 0) : 0;
-                    
-                    // Add rental property sale proceeds in the sell year
-                    const rentalPropertySale = year === rentalPropertySellYear ? (parseFloat(advancedData.rentalPropertyValue) || 0) : 0;
-                    
-                    portfolioBalance = portfolioBalance + portfolioReturn - portfolioDraw + inheritanceAmount + rentalPropertySale;
-                    
-                    years.push({
-                        year,
-                        portfolioBalance,
-                        portfolioDraw,
-                        totalOtherIncome,
-                        totalIncome: totalOtherIncome + portfolioDraw,
-                        totalNeeded,
-                        estimatedTaxes,
-                        desiredSpending,
-                        ssMrIncome,
-                        ssMrsIncome,
-                        rentalIncome,
-                        pensionIncome,
-                        mortgageSavings,
-                        inheritanceAmount,
-                        rentalPropertySale
-                    });
-                }
-                
-                return years;
-            };
-            
-            const projections = calculateProjections(inputs, advancedFunctions);
-            const projections2 = scenario2Inputs ? calculateProjections(scenario2Inputs, scenario2Advanced) : null;
-            
-            // Chart rendering
-            useEffect(() => {
-                if (chartRef.current) {
-                    if (chartInstance.current) {
-                        chartInstance.current.destroy();
-                    }
-                    
-                    const ctx = chartRef.current.getContext('2d');
-                    
-                    let datasets = [];
-                    
-                    if (activeTab === 'portfolio') {
-                        datasets = [{
-                            label: 'Portfolio Balance',
-                            data: projections.map(p => p.portfolioBalance),
-                            borderColor: '#d4af37',
-                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
-                        }];
-                    } else if (activeTab === 'income') {
-                        datasets = [
-                            {
-                                label: 'Social Security (MR)',
-                                data: projections.map(p => p.ssMrIncome),
-                                borderColor: '#1e3a5f',
-                                backgroundColor: 'rgba(30, 58, 95, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Social Security (MRS)',
-                                data: projections.map(p => p.ssMrsIncome),
-                                borderColor: '#8b9d83',
-                                backgroundColor: 'rgba(139, 157, 131, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Portfolio Draw',
-                                data: projections.map(p => p.portfolioDraw),
-                                borderColor: '#d4af37',
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ];
-                        
-                        if (inputs.rental > 0) {
-                            datasets.push({
-                                label: 'Rental Income',
-                                data: projections.map(p => p.rentalIncome),
-                                borderColor: '#5f6c7b',
-                                backgroundColor: 'rgba(95, 108, 123, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            });
-                        }
-                        
-                        if (inputs.pension > 0) {
-                            datasets.push({
-                                label: 'Pension Income',
-                                data: projections.map(p => p.pensionIncome),
-                                borderColor: '#0f1c2e',
-                                backgroundColor: 'rgba(15, 28, 46, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            });
-                        }
-                    } else {
-                        datasets = [
-                            {
-                                label: 'Total Needed',
-                                data: projections.map(p => p.totalNeeded),
-                                borderColor: '#c0392b',
-                                backgroundColor: 'rgba(192, 57, 43, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Net Spending',
-                                data: projections.map(p => p.desiredSpending),
-                                borderColor: '#d4af37',
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Estimated Taxes',
-                                data: projections.map(p => p.estimatedTaxes),
-                                borderColor: '#8b9d83',
-                                backgroundColor: 'rgba(139, 157, 131, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ];
-                    }
-                    
-                    chartInstance.current = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: projections.map(p => `Year ${p.year}`),
-                            datasets: datasets
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: true,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
-                                    labels: {
-                                        font: {
-                                            family: "'IBM Plex Sans', sans-serif",
-                                            size: 12
-                                        },
-                                        padding: 15,
-                                        usePointStyle: true
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString(undefined, {
-                                                minimumFractionDigits: 0,
-                                                maximumFractionDigits: 0
-                                            });
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '$' + (value / 1000).toFixed(0) + 'k';
-                                        },
-                                        font: {
-                                            family: "'IBM Plex Sans', sans-serif"
-                                        }
-                                    },
-                                    grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        font: {
-                                            family: "'IBM Plex Sans', sans-serif"
-                                        }
-                                    },
-                                    grid: {
-                                        display: false
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                return () => {
-                    if (chartInstance.current) {
-                        chartInstance.current.destroy();
-                    }
-                };
-            }, [projections, activeTab]);
-            
-            // Chart rendering for Scenario 2
-            useEffect(() => {
-                if (compareMode && chartRef2.current && projections2) {
-                    if (chartInstance2.current) {
-                        chartInstance2.current.destroy();
-                    }
-                    
-                    const ctx2 = chartRef2.current.getContext('2d');
-                    
-                    let datasets2 = [];
-                    
-                    if (activeTab === 'portfolio') {
-                        datasets2 = [{
-                            label: 'Portfolio Balance',
-                            data: projections2.map(p => p.portfolioBalance),
-                            borderColor: '#d4af37',
-                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
-                        }];
-                    } else if (activeTab === 'income') {
-                        datasets2 = [
-                            {
-                                label: 'Social Security (MR)',
-                                data: projections2.map(p => p.ssMrIncome),
-                                borderColor: '#1e3a5f',
-                                backgroundColor: 'rgba(30, 58, 95, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Social Security (MRS)',
-                                data: projections2.map(p => p.ssMrsIncome),
-                                borderColor: '#8b9d83',
-                                backgroundColor: 'rgba(139, 157, 131, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Portfolio Draw',
-                                data: projections2.map(p => p.portfolioDraw),
-                                borderColor: '#d4af37',
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ];
-                        
-                        if ((parseFloat(scenario2Inputs.rental) || 0) > 0) {
-                            datasets2.push({
-                                label: 'Rental Income',
-                                data: projections2.map(p => p.rentalIncome),
-                                borderColor: '#5f6c7b',
-                                backgroundColor: 'rgba(95, 108, 123, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            });
-                        }
-                        
-                        if ((parseFloat(scenario2Inputs.pension) || 0) > 0) {
-                            datasets2.push({
-                                label: 'Pension Income',
-                                data: projections2.map(p => p.pensionIncome),
-                                borderColor: '#0f1c2e',
-                                backgroundColor: 'rgba(15, 28, 46, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            });
-                        }
-                    } else {
-                        datasets2 = [
-                            {
-                                label: 'Total Needed',
-                                data: projections2.map(p => p.totalNeeded),
-                                borderColor: '#c0392b',
-                                backgroundColor: 'rgba(192, 57, 43, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Net Spending',
-                                data: projections2.map(p => p.desiredSpending),
-                                borderColor: '#d4af37',
-                                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Estimated Taxes',
-                                data: projections2.map(p => p.estimatedTaxes),
-                                borderColor: '#8b9d83',
-                                backgroundColor: 'rgba(139, 157, 131, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ];
-                    }
-                    
-                    chartInstance2.current = new Chart(ctx2, {
-                        type: 'line',
-                        data: {
-                            labels: projections2.map(p => `Year ${p.year}`),
-                            datasets: datasets2
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: true,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
-                                    labels: {
-                                        font: {
-                                            family: "'IBM Plex Sans', sans-serif",
-                                            size: 12
-                                        },
-                                        padding: 15,
-                                        usePointStyle: true
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString(undefined, {
-                                                minimumFractionDigits: 0,
-                                                maximumFractionDigits: 0
-                                            });
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '$' + (value / 1000).toFixed(0) + 'k';
-                                        },
-                                        font: {
-                                            family: "'IBM Plex Sans', sans-serif"
-                                        }
-                                    },
-                                    grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        font: {
-                                            family: "'IBM Plex Sans', sans-serif"
-                                        }
-                                    },
-                                    grid: {
-                                        display: false
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                return () => {
-                    if (chartInstance2.current) {
-                        chartInstance2.current.destroy();
-                    }
-                };
-            }, [projections2, activeTab, compareMode, scenario2Inputs]);
-            
-            const formatCurrency = (value) => {
-                return '$' + value.toLocaleString(undefined, {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                });
-            };
-            
-            const finalYear = projections[projections.length - 1];
-            
-            // Render input panel for either scenario
-            const renderInputPanel = (scenarioNum) => {
-                const isScenario2 = scenarioNum === 2;
-                const inputData = isScenario2 ? scenario2Inputs : inputs;
-                const advancedData = isScenario2 ? scenario2Advanced : advancedFunctions;
-                const handleInput = isScenario2 ? handleScenario2InputChange : handleInputChange;
-                const handleAdvanced = isScenario2 ? handleScenario2AdvancedChange : handleAdvancedFunctionChange;
-                
-                return (
+        }
+        return row;
+    };
+
+    const afterTax = accounts.filter(a => a.type === 'after-tax');
+    const taxDeferred = accounts.filter(a => a.type === 'tax-deferred');
+    const allAccts = [...afterTax, ...taxDeferred];
+
+    const totals = {};
+    GRID_COLS.forEach(c => totals[c] = 0);
+    let grandTotal = 0;
+    allAccts.forEach(a => {
+        const v = parseFloat(a.value) || 0;
+        grandTotal += v;
+        const row = computeRow(a);
+        GRID_COLS.forEach(c => totals[c] += row[c]);
+    });
+    const nonRE = grandTotal - (totals['Real Estate'] || 0);
+
+    // Only show columns that have money in them
+    const visibleCols = GRID_COLS.filter(c => Math.round(totals[c]) !== 0);
+
+    const renderCell = (v) => {
+        if (!v || Math.round(v) === 0) return <td className="zero">-</td>;
+        return <td>{fmtD(v)}</td>;
+    };
+
+    const renderDataRow = (acct, idx) => {
+        const row = computeRow(acct);
+        const v = parseFloat(acct.value) || 0;
+        return (
+            <tr className="drow" key={acct.id + idx}>
+                <td>{acct.name}</td>
+                <td>{fmtD(v)}</td>
+                {visibleCols.map(c => <React.Fragment key={c}>{renderCell(row[c])}</React.Fragment>)}
+            </tr>
+        );
+    };
+
+    // Sidebar account block
+    const renderAcctBlock = (acct) => {
+        const allocTotal = acct.hasAlloc ? ALLOC_CLASSES.reduce((s,c) => s + (parseFloat(acct.alloc[c])||0), 0) : 0;
+        const isOpen = openAllocs[acct.id];
+        const v = parseFloat(acct.value) || 0;
+        return (
+            <div className="nw-acct-block" key={acct.id}>
+                <div className="nw-acct-block-name">{acct.name}</div>
+                <input className="nw-acct-input" type="number" value={acct.value} onChange={e => updateValue(acct.id, e.target.value)} />
+                {acct.hasAlloc && (
                     <>
-                        <div className="section-title">Portfolio & Spending</div>
-                        
-                        <div className="input-group">
-                            <label>Starting Portfolio Balance</label>
-                            <input
-                                type="number"
-                                value={inputData.startingBalance}
-                                onChange={(e) => handleInput('startingBalance', e.target.value)}
-                            />
-                        </div>
-                        
-                        <div className="input-group">
-                            <label>Desired Annual Spending (Today's Dollars)</label>
-                            <input
-                                type="number"
-                                value={inputData.desiredSpending}
-                                onChange={(e) => handleInput('desiredSpending', e.target.value)}
-                            />
-                        </div>
-                        
-                        <div className="section-title" style={{marginTop: '30px'}}>Income Sources</div>
-                        
-                        <div className="input-row">
-                            <div className="input-group">
-                                <label>Social Security (MR)</label>
-                                <input
-                                    type="number"
-                                    value={inputData.ssMr}
-                                    onChange={(e) => handleInput('ssMr', e.target.value)}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Social Security (MRS)</label>
-                                <input
-                                    type="number"
-                                    value={inputData.ssMrs}
-                                    onChange={(e) => handleInput('ssMrs', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="input-row">
-                            <div className="input-group">
-                                <label>Rental Income</label>
-                                <input
-                                    type="number"
-                                    value={inputData.rental}
-                                    onChange={(e) => handleInput('rental', e.target.value)}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Pension Income</label>
-                                <input
-                                    type="number"
-                                    value={inputData.pension}
-                                    onChange={(e) => handleInput('pension', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="section-title" style={{marginTop: '30px'}}>Assumptions</div>
-                        
-                        <div className="input-row">
-                            <div className="input-group">
-                                <label>Portfolio Return (%)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={inputData.portfolioReturn}
-                                    onChange={(e) => handleInput('portfolioReturn', e.target.value)}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Tax Rate (%)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={inputData.taxRate}
-                                    onChange={(e) => handleInput('taxRate', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="input-row">
-                            <div className="input-group">
-                                <label>Expense Inflation (%)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={inputData.expenseInflation}
-                                    onChange={(e) => handleInput('expenseInflation', e.target.value)}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>SS Inflation (%)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={inputData.ssInflation}
-                                    onChange={(e) => handleInput('ssInflation', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="input-group">
-                            <label>SS Start Year</label>
-                            <input
-                                type="number"
-                                min="1"
-                                value={inputData.ssStartYear}
-                                onChange={(e) => handleInput('ssStartYear', e.target.value)}
-                            />
-                        </div>
-                        
-                        <div className="input-row">
-                            <div className="input-group">
-                                <label>Pension Inflation (%)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={inputData.pensionInflation}
-                                    onChange={(e) => handleInput('pensionInflation', e.target.value)}
-                                />
-                            </div>
-                            <div className="input-group">
-                                <label>Rental Inflation (%)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={inputData.rentalInflation}
-                                    onChange={(e) => handleInput('rentalInflation', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="input-group">
-                            <label>Projection Years</label>
-                            <input
-                                type="number"
-                                value={inputData.projectionYears}
-                                onChange={(e) => handleInput('projectionYears', e.target.value)}
-                            />
-                        </div>
-                        
-                        <button 
-                            className={`advanced-toggle ${showAdvanced ? 'active' : ''}`}
-                            onClick={() => setShowAdvanced(!showAdvanced)}
-                        >
-                            Advanced Functions
+                        <button className="nw-alloc-toggle" onClick={() => toggleAlloc(acct.id)}>
+                            Allocation Breakdown
+                            <span className={'arrow' + (isOpen ? ' open' : '')}>&#9660;</span>
                         </button>
-                        
-                        <div className={`advanced-section ${showAdvanced ? 'show' : ''}`}>>
-                            <div className="advanced-content">
-                                <div className="advanced-item">
-                                    <div className="advanced-item-title">Retirement Starting Point Calculator</div>
-                                    <p style={{fontSize: '0.85rem', color: 'var(--slate)', marginBottom: '15px'}}>
-                                        Calculate how much you'll have at retirement based on current savings and contributions.
-                                    </p>
-                                    <div className="input-group">
-                                        <label>Current Savings (PV)</label>
-                                        <input
-                                            type="number"
-                                            value={advancedData.retirementPV}
-                                            onChange={(e) => handleAdvanced('retirementPV', e.target.value)}
-                                        />
+                        {isOpen && (
+                            <div className="nw-alloc-panel">
+                                {ALLOC_CLASSES.map(cls => (
+                                    <div className="nw-alloc-row" key={cls}>
+                                        <span className="nw-alloc-label">{ALLOC_LABELS[cls]}</span>
+                                        <input className="nw-alloc-pct-input" type="number" step="0.1" value={acct.alloc[cls]} onChange={e => updateAllocPct(acct.id, cls, e.target.value)} />
+                                        <span className="nw-alloc-pct-unit">%</span>
+                                        <span className="nw-alloc-val">{fmtD(v * (parseFloat(acct.alloc[cls])||0) / 100)}</span>
                                     </div>
-                                    <div className="input-group">
-                                        <label>Years Until Retirement (N)</label>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value={advancedData.retirementYears}
-                                            onChange={(e) => handleAdvanced('retirementYears', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="input-group">
-                                        <label>Annual Return Rate (%)</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            value={advancedData.retirementRate}
-                                            onChange={(e) => handleAdvanced('retirementRate', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="input-group">
-                                        <label>Annual Contribution (PMT)</label>
-                                        <input
-                                            type="number"
-                                            value={advancedData.retirementPMT}
-                                            onChange={(e) => handleAdvanced('retirementPMT', e.target.value)}
-                                        />
-                                    </div>
-                                    <div style={{
-                                        marginTop: '20px',
-                                        padding: '20px',
-                                        background: 'linear-gradient(135deg, var(--deep-navy) 0%, var(--rich-blue) 100%)',
-                                        borderRadius: '8px',
-                                        color: 'white'
-                                    }}>
-                                        <div style={{fontSize: '0.85rem', marginBottom: '8px', opacity: 0.9}}>
-                                            Retirement Starting Point (FV)
-                                        </div>
-                                        <div style={{fontSize: '2rem', fontWeight: '600', fontFamily: "'Playfair Display', serif"}}>
-                                            {formatCurrency(
-                                                (() => {
-                                                    const pv = parseFloat(advancedData.retirementPV) || 0;
-                                                    const n = parseFloat(advancedData.retirementYears) || 0;
-                                                    const rate = (parseFloat(advancedData.retirementRate) || 0) / 100;
-                                                    const pmt = parseFloat(advancedData.retirementPMT) || 0;
-                                                    
-                                                    // FV = PV * (1 + r)^n + PMT * [((1 + r)^n - 1) / r]
-                                                    // PMT is treated as negative (outflow) so we negate it
-                                                    if (rate === 0) {
-                                                        return pv + (Math.abs(pmt) * n);
-                                                    }
-                                                    const fv = pv * Math.pow(1 + rate, n) + Math.abs(pmt) * ((Math.pow(1 + rate, n) - 1) / rate);
-                                                    return fv;
-                                                })()
-                                            )}
-                                        </div>
-                                        <button
-                                            style={{
-                                                marginTop: '15px',
-                                                padding: '10px 20px',
-                                                background: 'var(--gold)',
-                                                color: 'var(--deep-navy)',
-                                                border: 'none',
-                                                borderRadius: '6px',
-                                                fontWeight: '600',
-                                                cursor: 'pointer',
-                                                fontSize: '0.9rem',
-                                                fontFamily: "'IBM Plex Sans', sans-serif"
-                                            }}
-                                            onClick={() => {
-                                                const pv = parseFloat(advancedData.retirementPV) || 0;
-                                                const n = parseFloat(advancedData.retirementYears) || 0;
-                                                const rate = (parseFloat(advancedData.retirementRate) || 0) / 100;
-                                                const pmt = parseFloat(advancedData.retirementPMT) || 0;
-                                                
-                                                let fv;
-                                                if (rate === 0) {
-                                                    fv = pv + (Math.abs(pmt) * n);
-                                                } else {
-                                                    fv = pv * Math.pow(1 + rate, n) + Math.abs(pmt) * ((Math.pow(1 + rate, n) - 1) / rate);
-                                                }
-                                                
-                                                handleInput('startingBalance', fv.toString());
-                                            }}
-                                        >
-                                            Use as Starting Portfolio Balance
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div className="advanced-item">
-                                    <div className="advanced-item-title">Mortgage Drop-Off</div>
-                                    <div className="input-group">
-                                        <label>Annual Mortgage Amount</label>
-                                        <input
-                                            type="number"
-                                            value={advancedData.mortgageAmount}
-                                            onChange={(e) => handleAdvanced('mortgageAmount', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="input-group">
-                                        <label>Drop-Off Year</label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={advancedData.mortgageDropOffYear}
-                                            onChange={(e) => handleAdvanced('mortgageDropOffYear', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="advanced-item">
-                                    <div className="advanced-item-title">Inheritance / Lump Sum</div>
-                                    <div className="input-group">
-                                        <label>Inheritance Amount</label>
-                                        <input
-                                            type="number"
-                                            value={advancedData.inheritanceAmount}
-                                            onChange={(e) => handleAdvanced('inheritanceAmount', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="input-group">
-                                        <label>Year Received</label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={advancedData.inheritanceYear}
-                                            onChange={(e) => handleAdvanced('inheritanceYear', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="advanced-item">
-                                    <div className="advanced-item-title">Rental Property Sale</div>
-                                    <p style={{fontSize: '0.85rem', color: 'var(--slate)', marginBottom: '15px'}}>
-                                        Property sale adds equity to portfolio and stops rental income in that year.
-                                    </p>
-                                    <div className="input-group">
-                                        <label>Property Equity Value</label>
-                                        <input
-                                            type="number"
-                                            value={advancedData.rentalPropertyValue}
-                                            onChange={(e) => handleAdvanced('rentalPropertyValue', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="input-group">
-                                        <label>Sell Year</label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={advancedData.rentalPropertySellYear}
-                                            onChange={(e) => handleAdvanced('rentalPropertySellYear', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
+                                ))}
+                                {Math.abs(allocTotal - 100) > 0.1 && (
+                                    <div className="nw-alloc-warn">Total: {allocTotal.toFixed(1)}% — should equal 100%</div>
+                                )}
                             </div>
-                        </div>
+                        )}
                     </>
-                );
-            };
-            
-            return (
-                <div className="app-container">
-                    <button 
-                        className="toggle-button"
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                    >
-                        {isCollapsed ? 'SHOW INPUTS' : 'HIDE INPUTS'}
-                    </button>
-                    
-                    <div className="header">
-                        <h1>Retirement Income Planner</h1>
-                        <p className="subtitle">Professional retirement income projection and planning tool</p>
-                    </div>
-                    
-                    <div className={`main-content ${isCollapsed ? 'collapsed' : ''}`}>
-                        <div className="input-panel">
-                            {compareMode && (
-                                <div className="scenario-input-switcher">
-                                    <button 
-                                        className={`scenario-switch-btn ${activeScenarioInput === 1 ? 'active' : ''}`}
-                                        onClick={() => setActiveScenarioInput(1)}
-                                    >
-                                        Scenario 1 Inputs
-                                    </button>
-                                    <button 
-                                        className={`scenario-switch-btn ${activeScenarioInput === 2 ? 'active' : ''}`}
-                                        onClick={() => setActiveScenarioInput(2)}
-                                    >
-                                        Scenario 2 Inputs
-                                    </button>
-                                </div>
-                            )}
-                            
-                            {renderInputPanel(activeScenarioInput)}
-                        </div>
-                        
-                        <div className="results-panel">
-                            <div className="scenario-controls">
-                                {!compareMode ? (
-                                    <button className="scenario-button" onClick={createScenario2}>
-                                        Create Scenario 2 for Comparison
-                                    </button>
-                                ) : (
-                                    <button className="scenario-button" onClick={clearScenario2}>
-                                        Clear Scenario 2
-                                    </button>
-                                )}
-                                <button className="print-button" onClick={() => window.print()}>
-                                    Print / Save as PDF
-                                </button>
-                            </div>
-                            
-                            <div className={`scenario-container ${compareMode ? 'compare' : ''}`}>
-                                <div className="scenario-panel">
-                                    {compareMode && <div className="scenario-title">Scenario 1 (Current)</div>}
-                                    
-                            <div className="summary-cards">
-                                <div className="summary-card">
-                                    <div className="summary-card-label">Final Portfolio</div>
-                                    <div className="summary-card-value">
-                                        {formatCurrency(finalYear.portfolioBalance)}
-                                    </div>
-                                </div>
-                                <div className="summary-card">
-                                    <div className="summary-card-label">Year 1 Total Income</div>
-                                    <div className="summary-card-value">
-                                        {formatCurrency(projections[0].totalIncome)}
-                                    </div>
-                                </div>
-                                <div className="summary-card">
-                                    <div className="summary-card-label">Lifetime Income</div>
-                                    <div className="summary-card-value">
-                                        {formatCurrency(projections.reduce((sum, p) => sum + p.totalIncome, 0))}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="chart-container">
-                                <div className="tabs">
-                                    <button 
-                                        className={`tab ${activeTab === 'portfolio' ? 'active' : ''}`}
-                                        onClick={() => setActiveTab('portfolio')}
-                                    >
-                                        Portfolio Balance
-                                    </button>
-                                    <button 
-                                        className={`tab ${activeTab === 'income' ? 'active' : ''}`}
-                                        onClick={() => setActiveTab('income')}
-                                    >
-                                        Income Sources
-                                    </button>
-                                    <button 
-                                        className={`tab ${activeTab === 'spending' ? 'active' : ''}`}
-                                        onClick={() => setActiveTab('spending')}
-                                    >
-                                        Spending & Taxes
-                                    </button>
-                                </div>
-                                <canvas ref={chartRef}></canvas>
-                            </div>
-                            
-                            <div className="chart-title">Year-by-Year Projection</div>
-                            <div style={{overflowX: 'auto'}}>
-                                <table className="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Year</th>
-                                            <th>Portfolio</th>
-                                            <th>Draw</th>
-                                            <th>SS (MR)</th>
-                                            <th>SS (MRS)</th>
-                                            {(parseFloat(inputs.rental) || 0) > 0 && <th>Rental</th>}
-                                            {(parseFloat(inputs.pension) || 0) > 0 && <th>Pension</th>}
-                                            {(parseFloat(advancedFunctions.mortgageAmount) || 0) > 0 && <th>Mortgage Savings</th>}
-                                            {(parseFloat(advancedFunctions.inheritanceAmount) || 0) > 0 && <th>Inheritance</th>}
-                                            {(parseFloat(advancedFunctions.rentalPropertyValue) || 0) > 0 && <th>Property Sale</th>}
-                                            <th>Total Income</th>
-                                            <th>Spending</th>
-                                            <th>Taxes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {projections.map(p => (
-                                            <tr key={p.year}>
-                                                <td>{2025 + p.year}</td>
-                                                <td>{p.year}</td>
-                                                <td className={p.portfolioBalance < 0 ? 'negative' : ''}>
-                                                    {formatCurrency(p.portfolioBalance)}
-                                                </td>
-                                                <td>{formatCurrency(p.portfolioDraw)}</td>
-                                                <td>{formatCurrency(p.ssMrIncome)}</td>
-                                                <td>{formatCurrency(p.ssMrsIncome)}</td>
-                                                {(parseFloat(inputs.rental) || 0) > 0 && <td>{formatCurrency(p.rentalIncome)}</td>}
-                                                {(parseFloat(inputs.pension) || 0) > 0 && <td>{formatCurrency(p.pensionIncome)}</td>}
-                                                {(parseFloat(advancedFunctions.mortgageAmount) || 0) > 0 && <td className="positive">{formatCurrency(p.mortgageSavings)}</td>}
-                                                {(parseFloat(advancedFunctions.inheritanceAmount) || 0) > 0 && <td className="positive">{formatCurrency(p.inheritanceAmount)}</td>}
-                                                {(parseFloat(advancedFunctions.rentalPropertyValue) || 0) > 0 && <td className="positive">{formatCurrency(p.rentalPropertySale)}</td>}
-                                                <td>{formatCurrency(p.totalIncome)}</td>
-                                                <td>{formatCurrency(p.desiredSpending)}</td>
-                                                <td>{formatCurrency(p.estimatedTaxes)}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                                </div>
-                                
-                                {compareMode && projections2 && (
-                                    <div className="scenario-panel">
-                                        <div className="scenario-title">Scenario 2 (Alternative)</div>
-                                        
-                                        <div className="summary-cards">
-                                            <div className="summary-card">
-                                                <div className="summary-card-label">Final Portfolio</div>
-                                                <div className="summary-card-value">
-                                                    {formatCurrency(projections2[projections2.length - 1].portfolioBalance)}
-                                                </div>
-                                            </div>
-                                            <div className="summary-card">
-                                                <div className="summary-card-label">Year 1 Total Income</div>
-                                                <div className="summary-card-value">
-                                                    {formatCurrency(projections2[0].totalIncome)}
-                                                </div>
-                                            </div>
-                                            <div className="summary-card">
-                                                <div className="summary-card-label">Lifetime Income</div>
-                                                <div className="summary-card-value">
-                                                    {formatCurrency(projections2.reduce((sum, p) => sum + p.totalIncome, 0))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="chart-container">
-                                            <div className="tabs">
-                                                <button 
-                                                    className={`tab ${activeTab === 'portfolio' ? 'active' : ''}`}
-                                                    onClick={() => setActiveTab('portfolio')}
-                                                >
-                                                    Portfolio Balance
-                                                </button>
-                                                <button 
-                                                    className={`tab ${activeTab === 'income' ? 'active' : ''}`}
-                                                    onClick={() => setActiveTab('income')}
-                                                >
-                                                    Income Sources
-                                                </button>
-                                                <button 
-                                                    className={`tab ${activeTab === 'spending' ? 'active' : ''}`}
-                                                    onClick={() => setActiveTab('spending')}
-                                                >
-                                                    Spending & Taxes
-                                                </button>
-                                            </div>
-                                            <canvas ref={chartRef2}></canvas>
-                                        </div>
-                                        
-                                        <div className="chart-title">Year-by-Year Projection</div>
-                                        <div style={{overflowX: 'auto'}}>
-                                            <table className="data-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th>Year</th>
-                                                        <th>Portfolio</th>
-                                                        <th>Draw</th>
-                                                        <th>SS (MR)</th>
-                                                        <th>SS (MRS)</th>
-                                                        {(parseFloat(scenario2Inputs.rental) || 0) > 0 && <th>Rental</th>}
-                                                        {(parseFloat(scenario2Inputs.pension) || 0) > 0 && <th>Pension</th>}
-                                                        {(parseFloat(scenario2Advanced.mortgageAmount) || 0) > 0 && <th>Mortgage Savings</th>}
-                                                        {(parseFloat(scenario2Advanced.inheritanceAmount) || 0) > 0 && <th>Inheritance</th>}
-                                                        {(parseFloat(scenario2Advanced.rentalPropertyValue) || 0) > 0 && <th>Property Sale</th>}
-                                                        <th>Total Income</th>
-                                                        <th>Spending</th>
-                                                        <th>Taxes</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {projections2.map(p => (
-                                                        <tr key={p.year}>
-                                                            <td>{2025 + p.year}</td>
-                                                            <td>{p.year}</td>
-                                                            <td className={p.portfolioBalance < 0 ? 'negative' : ''}>
-                                                                {formatCurrency(p.portfolioBalance)}
-                                                            </td>
-                                                            <td>{formatCurrency(p.portfolioDraw)}</td>
-                                                            <td>{formatCurrency(p.ssMrIncome)}</td>
-                                                            <td>{formatCurrency(p.ssMrsIncome)}</td>
-                                                            {(parseFloat(scenario2Inputs.rental) || 0) > 0 && <td>{formatCurrency(p.rentalIncome)}</td>}
-                                                            {(parseFloat(scenario2Inputs.pension) || 0) > 0 && <td>{formatCurrency(p.pensionIncome)}</td>}
-                                                            {(parseFloat(scenario2Advanced.mortgageAmount) || 0) > 0 && <td className="positive">{formatCurrency(p.mortgageSavings)}</td>}
-                                                            {(parseFloat(scenario2Advanced.inheritanceAmount) || 0) > 0 && <td className="positive">{formatCurrency(p.inheritanceAmount)}</td>}
-                                                            {(parseFloat(scenario2Advanced.rentalPropertyValue) || 0) > 0 && <td className="positive">{formatCurrency(p.rentalPropertySale)}</td>}
-                                                            <td>{formatCurrency(p.totalIncome)}</td>
-                                                            <td>{formatCurrency(p.desiredSpending)}</td>
-                                                            <td>{formatCurrency(p.estimatedTaxes)}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className={'nw-layout' + (collapsed ? ' collapsed' : '')}>
+            <button className="nw-toggle" onClick={() => setCollapsed(!collapsed)}>{collapsed ? 'SHOW ASSUMPTIONS' : 'HIDE ASSUMPTIONS'}</button>
+
+            {/* SIDEBAR */}
+            <div className="nw-sidebar">
+                <div className="nw-sidebar-title">Assumptions</div>
+                <div className="nw-sidebar-sub">Edit account values and allocation breakdowns</div>
+                <div className="nw-acct-section-label">After-Tax Accounts</div>
+                {afterTax.map(a => renderAcctBlock(a))}
+                <div className="nw-acct-section-label">Tax-Deferred Accounts</div>
+                {taxDeferred.map(a => renderAcctBlock(a))}
+            </div>
+
+            {/* MAIN GRID */}
+            <div className="nw-main">
+                <div className="nw-title-area">
+                    <h2>Brad & Ash — Personal Net Worth</h2>
+                    <p>As of January 1, 2026</p>
+                </div>
+                <div className="nw-sheet-wrap">
+                    <table className="nw-sheet">
+                        <thead><tr>
+                            <th style={{textAlign:'left'}}>Account</th>
+                            <th>Total</th>
+                            {visibleCols.map(c => <th key={c}>{c}</th>)}
+                        </tr></thead>
+                        <tbody>
+                            <tr className="section-hdr"><td colSpan={visibleCols.length + 2}>After-Tax Accounts</td></tr>
+                            {afterTax.map((a,i) => renderDataRow(a,i))}
+                            <tr className="spacer"><td colSpan={visibleCols.length + 2}></td></tr>
+                            <tr className="section-hdr"><td colSpan={visibleCols.length + 2}>Tax-Deferred Accounts</td></tr>
+                            {taxDeferred.map((a,i) => renderDataRow(a,i))}
+                            <tr className="spacer"><td colSpan={visibleCols.length + 2}></td></tr>
+                            <tr className="total-row">
+                                <td>Total</td>
+                                <td>{fmtD(grandTotal)}</td>
+                                {visibleCols.map(c => <td key={c}>{fmtD(totals[c])}</td>)}
+                            </tr>
+                            <tr className="pct-row">
+                                <td>% of Total</td>
+                                <td style={{fontWeight:600}}>100%</td>
+                                {visibleCols.map(c => <td key={c}>{grandTotal>0 ? fmtP(totals[c]/grandTotal) : '-'}</td>)}
+                            </tr>
+                            <tr className="spacer"><td colSpan={visibleCols.length + 2}></td></tr>
+                            <tr className="nonre-row">
+                                <td>Non-Real Estate</td>
+                                <td>{fmtD(nonRE)}</td>
+                                {visibleCols.map(c => <td key={c}></td>)}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ==================================================================
+   RETIREMENT PLANNER TAB (with rental income fix)
+   ================================================================== */
+function RetirementPlannerTab() {
+    const [inputs, setInputs] = useState({ startingBalance:1450000, desiredSpending:84000, ssMr:30000, ssMrs:18000, rental:0, pension:0, portfolioReturn:4.0, taxRate:10.0, inflationGeneral:2.5, expenseInflation:2.5, ssInflation:2.0, ssStartYear:1, pensionInflation:1.0, rentalInflation:2.0, projectionYears:30 });
+    const [adv, setAdv] = useState({ mortgageAmount:0, mortgageDropOffYear:1, inheritanceAmount:0, inheritanceYear:1, retirementPV:0, retirementYears:0, retirementRate:7, retirementPMT:0, rentalPropertyValue:0, rentalPropertySellYear:1 });
+    const [s2Inp, setS2Inp] = useState(null); const [s2Adv, setS2Adv] = useState(null);
+    const [compareMode, setCompareMode] = useState(false); const [activeS, setActiveS] = useState(1);
+    const [activeTab, setActiveTab] = useState('portfolio');
+    const [isCollapsed, setIsCollapsed] = useState(false); const [showAdv, setShowAdv] = useState(false);
+    const cRef = useRef(null); const cInst = useRef(null); const cRef2 = useRef(null); const cInst2 = useRef(null);
+    const mh = setter => (f,v) => { if(v==='')setter(p=>({...p,[f]:''})); else setter(p=>({...p,[f]:parseFloat(v)||0})); };
+    const hI=mh(setInputs), hA=mh(setAdv), hS2I=mh(setS2Inp), hS2A=mh(setS2Adv);
+    const mkS2=()=>{setS2Inp({...inputs});setS2Adv({...adv});setCompareMode(true);}; const clrS2=()=>{setS2Inp(null);setS2Adv(null);setCompareMode(false);setActiveS(1);};
+
+    const calc = (inp, ad) => {
+        const yrs=[]; let bal=parseFloat(inp.startingBalance)||0;
+        for(let y=1;y<=(parseFloat(inp.projectionYears)||30);y++){
+            const eM=Math.pow(1+(parseFloat(inp.expenseInflation)||0)/100,y-1),ssM=Math.pow(1+(parseFloat(inp.ssInflation)||0)/100,y-1),rM=Math.pow(1+(parseFloat(inp.rentalInflation)||0)/100,y-1),pM=Math.pow(1+(parseFloat(inp.pensionInflation)||0)/100,y-1);
+            const ssMr=y>=(parseFloat(inp.ssStartYear)||1)?(parseFloat(inp.ssMr)||0)*ssM:0,ssMrs=y>=(parseFloat(inp.ssStartYear)||1)?(parseFloat(inp.ssMrs)||0)*ssM:0;
+            const rpsy=parseFloat(ad.rentalPropertySellYear)||1,rpv=parseFloat(ad.rentalPropertyValue)||0;
+            const rentalCut=rpv>0?rpsy:Infinity;
+            const rental=y<rentalCut?(parseFloat(inp.rental)||0)*rM:0;
+            const pension=(parseFloat(inp.pension)||0)*pM,mtg=y>=(parseFloat(ad.mortgageDropOffYear)||1)?(parseFloat(ad.mortgageAmount)||0):0;
+            const oi=ssMr+ssMrs+rental+pension,sp=(parseFloat(inp.desiredSpending)||0)*eM,need=sp/(1-(parseFloat(inp.taxRate)||0)/100),draw=need-oi-mtg,tax=need-sp;
+            const ret=bal*((parseFloat(inp.portfolioReturn)||0)/100),inh=y===(parseFloat(ad.inheritanceYear)||1)?(parseFloat(ad.inheritanceAmount)||0):0;
+            const rpSale=y===rpsy&&rpv>0?rpv:0;
+            bal=bal+ret-draw+inh+rpSale;
+            yrs.push({year:y,portfolioBalance:bal,portfolioDraw:draw,totalOtherIncome:oi,totalIncome:oi+draw,totalNeeded:need,estimatedTaxes:tax,desiredSpending:sp,ssMrIncome:ssMr,ssMrsIncome:ssMrs,rentalIncome:rental,pensionIncome:pension,mortgageSavings:mtg,inheritanceAmount:inh,rentalPropertySale:rpSale});
+        } return yrs;
+    };
+    const proj=calc(inputs,adv), proj2=s2Inp?calc(s2Inp,s2Adv):null;
+    const bDS=(ps,inp)=>{
+        if(activeTab==='portfolio')return[{label:'Portfolio Balance',data:ps.map(p=>p.portfolioBalance),borderColor:'#d4af37',backgroundColor:'rgba(212,175,55,0.1)',borderWidth:3,fill:true,tension:0.4}];
+        if(activeTab==='income'){const ds=[{label:'SS (MR)',data:ps.map(p=>p.ssMrIncome),borderColor:'#1e3a5f',backgroundColor:'rgba(30,58,95,0.1)',borderWidth:2,fill:true,tension:0.4},{label:'SS (MRS)',data:ps.map(p=>p.ssMrsIncome),borderColor:'#8b9d83',backgroundColor:'rgba(139,157,131,0.1)',borderWidth:2,fill:true,tension:0.4},{label:'Portfolio Draw',data:ps.map(p=>p.portfolioDraw),borderColor:'#d4af37',backgroundColor:'rgba(212,175,55,0.1)',borderWidth:2,fill:true,tension:0.4}];if((parseFloat(inp.rental)||0)>0)ds.push({label:'Rental',data:ps.map(p=>p.rentalIncome),borderColor:'#5f6c7b',backgroundColor:'rgba(95,108,123,0.1)',borderWidth:2,fill:true,tension:0.4});if((parseFloat(inp.pension)||0)>0)ds.push({label:'Pension',data:ps.map(p=>p.pensionIncome),borderColor:'#0f1c2e',backgroundColor:'rgba(15,28,46,0.1)',borderWidth:2,fill:true,tension:0.4});return ds;}
+        return[{label:'Total Needed',data:ps.map(p=>p.totalNeeded),borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,0.1)',borderWidth:2,fill:true,tension:0.4},{label:'Net Spending',data:ps.map(p=>p.desiredSpending),borderColor:'#d4af37',backgroundColor:'rgba(212,175,55,0.1)',borderWidth:2,fill:true,tension:0.4},{label:'Taxes',data:ps.map(p=>p.estimatedTaxes),borderColor:'#8b9d83',backgroundColor:'rgba(139,157,131,0.1)',borderWidth:2,fill:true,tension:0.4}];
+    };
+    const cO={responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,position:'top',labels:{font:{family:"'IBM Plex Sans'",size:12},padding:15,usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k',font:{family:"'IBM Plex Sans'"}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{family:"'IBM Plex Sans'"}},grid:{display:false}}}};
+    useEffect(()=>{if(cRef.current){if(cInst.current)cInst.current.destroy();cInst.current=new Chart(cRef.current.getContext('2d'),{type:'line',data:{labels:proj.map(p=>'Year '+p.year),datasets:bDS(proj,inputs)},options:cO});}return()=>{if(cInst.current)cInst.current.destroy();};},[proj,activeTab]);
+    useEffect(()=>{if(compareMode&&cRef2.current&&proj2){if(cInst2.current)cInst2.current.destroy();cInst2.current=new Chart(cRef2.current.getContext('2d'),{type:'line',data:{labels:proj2.map(p=>'Year '+p.year),datasets:bDS(proj2,s2Inp)},options:cO});}return()=>{if(cInst2.current)cInst2.current.destroy();};},[proj2,activeTab,compareMode]);
+
+    const fc=v=>'$'+v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
+    const rIP=(sN)=>{const is2=sN===2,d=is2?s2Inp:inputs,ad2=is2?s2Adv:adv,h=is2?hS2I:hI,ha=is2?hS2A:hA;
+        return(<>
+        <div className="section-title">Portfolio & Spending</div>
+        <div className="input-group"><label>Starting Portfolio Balance</label><input type="number" value={d.startingBalance} onChange={e=>h('startingBalance',e.target.value)}/></div>
+        <div className="input-group"><label>Desired Annual Spending</label><input type="number" value={d.desiredSpending} onChange={e=>h('desiredSpending',e.target.value)}/></div>
+        <div className="section-title" style={{marginTop:'30px'}}>Income Sources</div>
+        <div className="input-row"><div className="input-group"><label>Social Security (MR)</label><input type="number" value={d.ssMr} onChange={e=>h('ssMr',e.target.value)}/></div><div className="input-group"><label>Social Security (MRS)</label><input type="number" value={d.ssMrs} onChange={e=>h('ssMrs',e.target.value)}/></div></div>
+        <div className="input-row"><div className="input-group"><label>Rental Income</label><input type="number" value={d.rental} onChange={e=>h('rental',e.target.value)}/></div><div className="input-group"><label>Pension Income</label><input type="number" value={d.pension} onChange={e=>h('pension',e.target.value)}/></div></div>
+        <div className="section-title" style={{marginTop:'30px'}}>Assumptions</div>
+        <div className="input-row"><div className="input-group"><label>Portfolio Return (%)</label><input type="number" step="0.1" value={d.portfolioReturn} onChange={e=>h('portfolioReturn',e.target.value)}/></div><div className="input-group"><label>Tax Rate (%)</label><input type="number" step="0.1" value={d.taxRate} onChange={e=>h('taxRate',e.target.value)}/></div></div>
+        <div className="input-row"><div className="input-group"><label>Expense Inflation (%)</label><input type="number" step="0.1" value={d.expenseInflation} onChange={e=>h('expenseInflation',e.target.value)}/></div><div className="input-group"><label>SS Inflation (%)</label><input type="number" step="0.1" value={d.ssInflation} onChange={e=>h('ssInflation',e.target.value)}/></div></div>
+        <div className="input-group"><label>SS Start Year</label><input type="number" min="1" value={d.ssStartYear} onChange={e=>h('ssStartYear',e.target.value)}/></div>
+        <div className="input-row"><div className="input-group"><label>Pension Inflation (%)</label><input type="number" step="0.1" value={d.pensionInflation} onChange={e=>h('pensionInflation',e.target.value)}/></div><div className="input-group"><label>Rental Inflation (%)</label><input type="number" step="0.1" value={d.rentalInflation} onChange={e=>h('rentalInflation',e.target.value)}/></div></div>
+        <div className="input-group"><label>Projection Years</label><input type="number" value={d.projectionYears} onChange={e=>h('projectionYears',e.target.value)}/></div>
+        <button className={'advanced-toggle'+(showAdv?' active':'')} onClick={()=>setShowAdv(!showAdv)}>Advanced Functions</button>
+        <div className={'advanced-section'+(showAdv?' show':'')}>
+            <div className="advanced-content">
+                <div className="advanced-item"><div className="advanced-item-title">Retirement Starting Point Calculator</div><p style={{fontSize:'0.85rem',color:'var(--slate)',marginBottom:'15px'}}>Calculate how much you'll have at retirement.</p>
+                    <div className="input-group"><label>Current Savings (PV)</label><input type="number" value={ad2.retirementPV} onChange={e=>ha('retirementPV',e.target.value)}/></div>
+                    <div className="input-group"><label>Years Until Retirement</label><input type="number" min="0" value={ad2.retirementYears} onChange={e=>ha('retirementYears',e.target.value)}/></div>
+                    <div className="input-group"><label>Annual Return (%)</label><input type="number" step="0.1" value={ad2.retirementRate} onChange={e=>ha('retirementRate',e.target.value)}/></div>
+                    <div className="input-group"><label>Annual Contribution</label><input type="number" value={ad2.retirementPMT} onChange={e=>ha('retirementPMT',e.target.value)}/></div>
+                    <div style={{marginTop:'20px',padding:'20px',background:'linear-gradient(135deg,var(--deep-navy),var(--rich-blue))',borderRadius:'8px',color:'white'}}>
+                        <div style={{fontSize:'0.85rem',marginBottom:'8px',opacity:0.9}}>Retirement Starting Point (FV)</div>
+                        <div style={{fontSize:'2rem',fontWeight:'600',fontFamily:"'Playfair Display',serif"}}>{fc((()=>{const pv=parseFloat(ad2.retirementPV)||0,n=parseFloat(ad2.retirementYears)||0,r=(parseFloat(ad2.retirementRate)||0)/100,pm=parseFloat(ad2.retirementPMT)||0;if(r===0)return pv+(Math.abs(pm)*n);return pv*Math.pow(1+r,n)+Math.abs(pm)*((Math.pow(1+r,n)-1)/r);})())}</div>
+                        <button style={{marginTop:'15px',padding:'10px 20px',background:'var(--gold)',color:'var(--deep-navy)',border:'none',borderRadius:'6px',fontWeight:'600',cursor:'pointer',fontSize:'0.9rem',fontFamily:"'IBM Plex Sans'"}} onClick={()=>{const pv=parseFloat(ad2.retirementPV)||0,n=parseFloat(ad2.retirementYears)||0,r=(parseFloat(ad2.retirementRate)||0)/100,pm=parseFloat(ad2.retirementPMT)||0;let fv;if(r===0)fv=pv+(Math.abs(pm)*n);else fv=pv*Math.pow(1+r,n)+Math.abs(pm)*((Math.pow(1+r,n)-1)/r);h('startingBalance',fv.toString());}}>Use as Starting Balance</button>
                     </div>
                 </div>
-            );
-        }
-        
-        ReactDOM.render(<RetirementPlanner />, document.getElementById('root'));
-    </script>
+                <div className="advanced-item"><div className="advanced-item-title">Mortgage Drop-Off</div><div className="input-group"><label>Annual Mortgage</label><input type="number" value={ad2.mortgageAmount} onChange={e=>ha('mortgageAmount',e.target.value)}/></div><div className="input-group"><label>Drop-Off Year</label><input type="number" min="1" value={ad2.mortgageDropOffYear} onChange={e=>ha('mortgageDropOffYear',e.target.value)}/></div></div>
+                <div className="advanced-item"><div className="advanced-item-title">Inheritance / Lump Sum</div><div className="input-group"><label>Amount</label><input type="number" value={ad2.inheritanceAmount} onChange={e=>ha('inheritanceAmount',e.target.value)}/></div><div className="input-group"><label>Year Received</label><input type="number" min="1" value={ad2.inheritanceYear} onChange={e=>ha('inheritanceYear',e.target.value)}/></div></div>
+                <div className="advanced-item"><div className="advanced-item-title">Rental Property Sale</div><p style={{fontSize:'0.85rem',color:'var(--slate)',marginBottom:'15px'}}>Adds equity to portfolio and stops rental income.</p><div className="input-group"><label>Property Equity Value</label><input type="number" value={ad2.rentalPropertyValue} onChange={e=>ha('rentalPropertyValue',e.target.value)}/></div><div className="input-group"><label>Sell Year</label><input type="number" min="1" value={ad2.rentalPropertySellYear} onChange={e=>ha('rentalPropertySellYear',e.target.value)}/></div></div>
+            </div>
+        </div>
+        </>);
+    };
+    const rSP=(ps,inp,ad2,cr,title)=>{const fy=ps[ps.length-1];return(
+        <div className="scenario-panel">{title&&<div className="scenario-title">{title}</div>}
+        <div className="rp-summary-cards"><div className="rp-summary-card"><div className="rp-summary-card-label">Final Portfolio</div><div className="rp-summary-card-value">{fc(fy.portfolioBalance)}</div></div><div className="rp-summary-card"><div className="rp-summary-card-label">Year 1 Income</div><div className="rp-summary-card-value">{fc(ps[0].totalIncome)}</div></div><div className="rp-summary-card"><div className="rp-summary-card-label">Lifetime Income</div><div className="rp-summary-card-value">{fc(ps.reduce((s,p)=>s+p.totalIncome,0))}</div></div></div>
+        <div className="chart-container"><div className="rp-tabs"><button className={'rp-tab'+(activeTab==='portfolio'?' active':'')} onClick={()=>setActiveTab('portfolio')}>Portfolio Balance</button><button className={'rp-tab'+(activeTab==='income'?' active':'')} onClick={()=>setActiveTab('income')}>Income Sources</button><button className={'rp-tab'+(activeTab==='spending'?' active':'')} onClick={()=>setActiveTab('spending')}>Spending & Taxes</button></div><canvas ref={cr}></canvas></div>
+        <div className="chart-title">Year-by-Year Projection</div>
+        <div style={{overflowX:'auto'}}><table className="data-table"><thead><tr><th></th><th>Year</th><th>Portfolio</th><th>Draw</th><th>SS (MR)</th><th>SS (MRS)</th>
+            {(parseFloat(inp.rental)||0)>0&&<th>Rental</th>}{(parseFloat(inp.pension)||0)>0&&<th>Pension</th>}
+            {(parseFloat(ad2.mortgageAmount)||0)>0&&<th>Mtg Savings</th>}{(parseFloat(ad2.inheritanceAmount)||0)>0&&<th>Inheritance</th>}{(parseFloat(ad2.rentalPropertyValue)||0)>0&&<th>Prop. Sale</th>}
+            <th>Total Inc</th><th>Spending</th><th>Taxes</th></tr></thead><tbody>
+            {ps.map(p=>(<tr key={p.year}><td>{2025+p.year}</td><td>{p.year}</td><td className={p.portfolioBalance<0?'negative':''}>{fc(p.portfolioBalance)}</td><td>{fc(p.portfolioDraw)}</td><td>{fc(p.ssMrIncome)}</td><td>{fc(p.ssMrsIncome)}</td>
+                {(parseFloat(inp.rental)||0)>0&&<td>{fc(p.rentalIncome)}</td>}{(parseFloat(inp.pension)||0)>0&&<td>{fc(p.pensionIncome)}</td>}
+                {(parseFloat(ad2.mortgageAmount)||0)>0&&<td className="positive">{fc(p.mortgageSavings)}</td>}{(parseFloat(ad2.inheritanceAmount)||0)>0&&<td className="positive">{fc(p.inheritanceAmount)}</td>}{(parseFloat(ad2.rentalPropertyValue)||0)>0&&<td className="positive">{fc(p.rentalPropertySale)}</td>}
+                <td>{fc(p.totalIncome)}</td><td>{fc(p.desiredSpending)}</td><td>{fc(p.estimatedTaxes)}</td></tr>))}
+        </tbody></table></div></div>);};
+
+    return(<div className="rp-container">
+        <button className="toggle-button" onClick={()=>setIsCollapsed(!isCollapsed)}>{isCollapsed?'SHOW INPUTS':'HIDE INPUTS'}</button>
+        <div className="rp-header"><h1>Retirement Income Planner</h1><p className="subtitle">Professional retirement income projection and planning tool</p></div>
+        <div className={'rp-main'+(isCollapsed?' collapsed':'')}>
+            <div className="input-panel">
+                {compareMode&&(<div className="scenario-input-switcher"><button className={'scenario-switch-btn'+(activeS===1?' active':'')} onClick={()=>setActiveS(1)}>Scenario 1</button><button className={'scenario-switch-btn'+(activeS===2?' active':'')} onClick={()=>setActiveS(2)}>Scenario 2</button></div>)}
+                {rIP(activeS)}
+            </div>
+            <div className="results-panel">
+                <div className="scenario-controls">{!compareMode?<button className="scenario-button" onClick={mkS2}>Create Scenario 2 for Comparison</button>:<button className="scenario-button" onClick={clrS2}>Clear Scenario 2</button>}<button className="print-button" onClick={()=>window.print()}>Print / Save as PDF</button></div>
+                <div className={'scenario-container'+(compareMode?' compare':'')}>
+                    {rSP(proj,inputs,adv,cRef,compareMode?'Scenario 1 (Current)':null)}
+                    {compareMode&&proj2&&rSP(proj2,s2Inp,s2Adv,cRef2,'Scenario 2 (Alternative)')}
+                </div>
+            </div>
+        </div>
+    </div>);
+}
+
+/* ==================================================================
+   MAIN APP
+   ================================================================== */
+function App(){
+    const[mt,setMt]=useState('networth');
+    return(<div>
+        <div className="top-nav"><div className="top-nav-inner">
+            <div className="top-nav-brand"><div className="top-nav-logo">F</div><span className="top-nav-title">Financial Planner</span><span className="top-nav-client">&mdash; Brad & Ash</span></div>
+            <div className="top-nav-tabs">
+                <button className={'top-nav-tab'+(mt==='networth'?' active':'')} onClick={()=>setMt('networth')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Net Worth</button>
+                <button className={'top-nav-tab'+(mt==='retirement'?' active':'')} onClick={()=>setMt('retirement')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-8"/></svg>Retirement Income</button>
+            </div>
+            <div className="top-nav-date">January 1, 2026</div>
+        </div></div>
+        <div className={'tab-panel'+(mt==='networth'?' active':'')}><NetWorthTab/></div>
+        <div className={'tab-panel'+(mt==='retirement'?' active':'')}><RetirementPlannerTab/></div>
+    </div>);
+}
+ReactDOM.render(<App/>,document.getElementById('root'));
+</script>
 </body>
 </html>

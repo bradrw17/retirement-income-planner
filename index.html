@@ -213,9 +213,9 @@ function NetWorthTab() {
     // fixedAlloc = the account always maps its full value to one specific grid column
     const [accounts, setAccounts] = useState([
         { id:'annuity',   name:'Annuity',             type:'after-tax',    value:100000,  hasAlloc:false, fixedCol:'Guaranteed Growth' },
-        { id:'chase_p',   name:'Chase Personal',      type:'after-tax',    value:30000,   hasAlloc:false, fixedCol:'Cash' },
-        { id:'chase_sc',  name:'Chase S Corp',        type:'after-tax',    value:5000,    hasAlloc:false, fixedCol:'Cash' },
-        { id:'jpm',       name:'JP Morgan Brokerage', type:'after-tax',    value:2500000, hasAlloc:true,  alloc:{equity:40.32,fixedIncome:0,alternatives:59.68,cash:0} },
+        { id:'chase_p',   name:'Personal Checking',      type:'after-tax',    value:30000,   hasAlloc:false, fixedCol:'Cash' },
+        { id:'chase_sc',  name:'Personal Savings',        type:'after-tax',    value:5000,    hasAlloc:false, fixedCol:'Cash' },
+        { id:'jpm',       name:'Brokerage', type:'after-tax',    value:2500000, hasAlloc:true,  alloc:{equity:40.32,fixedIncome:0,alternatives:59.68,cash:0} },
         { id:'rental',    name:'Rental Property',     type:'after-tax',    value:2000000, hasAlloc:false, fixedCol:'Real Estate' },
         { id:'529a',      name:'529 (Child 1)',       type:'after-tax',    value:75200,   hasAlloc:true,  alloc:{equity:100,fixedIncome:0,alternatives:0,cash:0} },
         { id:'529b',      name:'529 (Child 2)',       type:'after-tax',    value:75200,   hasAlloc:true,  alloc:{equity:100,fixedIncome:0,alternatives:0,cash:0} },

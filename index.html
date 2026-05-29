@@ -58,7 +58,9 @@
 
         .nw-acct-block { margin-bottom: 14px; background: var(--cream); border: 1px solid var(--light-slate); border-radius: 8px; padding: 14px; }
         .nw-acct-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .nw-acct-block-name { font-weight: 600; font-size: 0.88rem; color: var(--deep-navy); }
+        .nw-acct-block-name { font-weight: 600; font-size: 0.88rem; color: var(--deep-navy); width: 100%; background: transparent; border: 1px solid transparent; border-radius: 4px; padding: 2px 6px; font-family: 'IBM Plex Sans', sans-serif; }
+        .nw-acct-block-name:hover { border-color: var(--light-slate); background: rgba(255,255,255,0.5); }
+        .nw-acct-block-name:focus { outline: none; border-color: var(--gold); background: white; }
         .nw-acct-input { width: 100%; padding: 9px 12px; border: 2px solid var(--light-slate); border-radius: 6px; font-size: 0.95rem; font-family: 'IBM Plex Sans', sans-serif; background: white; transition: all 0.2s; }
         .nw-acct-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.1); }
 
@@ -225,7 +227,10 @@ function NetWorthTab() {
     const [openAllocs, setOpenAllocs] = useState({});
 
     const toggleAlloc = id => setOpenAllocs(p => ({...p, [id]: !p[id]}));
-    const updateValue = (id, val) => setAccounts(prev => prev.map(a => a.id===id ? {...a, value: val==='' ? '' : (parseFloat(val)||0)} : a));
+    const updateName = (id, name) => {
+        setAccounts(prev => prev.map(a => a.id === id ? {...a, name} : a));
+    };
+        const updateValue = (id, val) => setAccounts(prev => prev.map(a => a.id===id ? {...a, value: val==='' ? '' : (parseFloat(val)||0)} : a));
     const updateAllocPct = (id, cls, val) => {
         setAccounts(prev => prev.map(a => {
             if (a.id !== id) return a;
@@ -293,7 +298,7 @@ function NetWorthTab() {
         const v = parseFloat(acct.value) || 0;
         return (
             <div className="nw-acct-block" key={acct.id}>
-                <div className="nw-acct-block-name">{acct.name}</div>
+                <input className="nw-acct-block-name" type="text" value={acct.name} onChange={e => updateName(acct.id, e.target.value)} title="Click to rename this account" />
                 <input className="nw-acct-input" type="number" value={acct.value} onChange={e => updateValue(acct.id, e.target.value)} />
                 {acct.hasAlloc && (
                     <>
